@@ -1,0 +1,93 @@
+---
+title: "Data Wrangling Exercise"
+output:
+  html_document:
+    df_print: paged
+---
+## Creating New Variables Using "mutate()"
+```{r}
+library(tidyverse)
+
+f <- "https://raw.githubusercontent.com/difiore/ADA-datasets/master/data-wrangling.csv"
+d <- read_csv(f, col_names = TRUE)
+
+d <- mutate(d, "BSD" = Body_mass_male_mean / Body_mass_female_mean)
+d <- mutate(d, "Sex_Ratio" = AdultFemale / AdultMales)
+d <- mutate(d, "DI" = DayLength_km / (2 * sqrt(HomeRange_km2 / pi)))
+```
+
+## Plotting Relationships Between Variables Using ggplot2
+``` {r}
+library(ggplot2)
+
+p_O <- ggplot(data = d, aes(
+  x = DayLength_km,
+  y = Move,
+  ))
+p_O <- p_O + xlab("Day Range Length (km)") + ylab("Time Spent Moving (s)")
+p_O <- p_O + geom_point(na.rm = TRUE)
+p_O
+
+p_F <- ggplot(data = d, aes(
+  x = DayLength_km,
+  y = Move,
+  color = factor(Family)
+  ))
+p_F <- p_F + xlab("Day Range Length (km)") + ylab("Time Spent Moving (s)")
+p_F <- p_F + geom_point(na.rm = TRUE)
+p_F <- p_F + theme(legend.position = "bottom", legend.title = element_blank())
+p_F
+
+p_O <- ggplot(data = d, aes(
+  x = DayLength_km,
+  y = MeanGroupSize,
+  ))
+p_O <- p_O + xlab("Day Range Length (km)") + ylab("Mean Group Size")
+p_O <- p_O + geom_point(na.rm = TRUE)
+p_O
+
+p_F <- ggplot(data = d, aes(
+  x = DayLength_km,
+  y = MeanGroupSize,
+  color = factor(Family)
+  ))
+p_F <- p_F + xlab("Day Range Length (km)") + ylab("Mean Group Size")
+p_F <- p_F + geom_point(na.rm = TRUE)
+p_F <- p_F + theme(legend.position = "bottom", legend.title = element_blank())
+p_F
+
+p_O <- ggplot(data = d, aes(
+  x = BSD,
+  y = Canine_Dimorphism,
+  ))
+p_O <- p_O + xlab("Body Size Dimorphism") + ylab("Canine Dimorphism")
+p_O <- p_O + geom_point(na.rm = TRUE)
+p_O
+
+p_F <- ggplot(data = d, aes(
+  x = BSD,
+  y = Canine_Dimorphism,
+  color = factor(Family)
+  ))
+p_F <- p_F + xlab("Body Size Dimorphism") + ylab("Canine Dimorphism")
+p_F <- p_F + geom_point(na.rm = TRUE)
+p_F <- p_F + theme(legend.position = "bottom", legend.title = element_blank())
+p_F
+```
+
+## Creating New Variables with Conditional Expressions
+``` {r}
+d <- mutate(d, "Diet_Strategy" = ifelse(
+  d$Fruit > 50, "Frugivore", ifelse(
+  d$Leaves > 50, "Folivore", "Omnivore"
+  )
+  ))
+
+p_D <- ggplot(data = na.omit(d), aes(
+  x = Diet_Strategy,
+  y = MeanGroupSize
+  ))
+p_D <- p_D + xlab("Diet Strategy") + ylab("Mean Group Size")
+p_D <- p_D + geom_boxplot(na.rm = TRUE)
+p_D
+```
